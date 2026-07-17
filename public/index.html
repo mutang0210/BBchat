@@ -11,9 +11,13 @@
             --border-color: #3a3a3e;   /* 柔和的低對比灰線 */
             --text-main: #e3e3e8;      /* 象牙白，最適合長時間閱讀 */
             --text-muted: #8a8a93;     /* 溫和的低飽和中灰 */
-            --accent-soft: #81c784;    /* 溫和的護眼草綠色（取代刺眼的螢光綠） */
+            --accent-soft: #81c784;    /* 溫和的護眼草綠色 */
             --input-bg: #222226;       /* 輸入框背景 */
             --tag-checked-bg: #2d312e; /* 標籤選中時的低飽和綠灰底 */
+            
+            /* 補回光暈效果的陰影設定 */
+            --glow-main: 0 0 8px rgba(227, 227, 232, 0.4);
+            --glow-soft: 0 0 8px rgba(129, 199, 132, 0.5);
         }
 
         body { 
@@ -64,6 +68,8 @@
             text-transform: uppercase;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 15px;
+            /* 補回大標題光暈 */
+            text-shadow: var(--glow-main);
         }
 
         label {
@@ -86,11 +92,12 @@
             font-family: inherit;
             font-size: 18px; 
             font-weight: bold;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         input[type="text"]:focus {
             outline: none;
             border-color: var(--text-main);
+            box-shadow: var(--glow-main);
         }
 
         /* 複選標籤排版 */
@@ -119,6 +126,9 @@
             background: var(--tag-checked-bg);
             border-color: var(--accent-soft);
             color: var(--accent-soft);
+            /* 選中標籤補回柔和綠光暈 */
+            text-shadow: var(--glow-soft);
+            box-shadow: inset 0 0 4px rgba(129, 199, 132, 0.2);
         }
 
         /* 聊天主畫面 */
@@ -139,6 +149,7 @@
             margin: 0;
             font-size: 16px;
             color: var(--text-muted);
+            transition: color 0.3s ease;
         }
 
         #chatBox { 
@@ -151,7 +162,7 @@
             gap: 16px;
         }
 
-        /* 聊天訊息（寬敞、清晰大字體） */
+        /* 聊天訊息 */
         .msg { 
             margin: 0; 
             line-height: 1.6; 
@@ -163,9 +174,18 @@
             margin-right: 12px; 
             color: var(--text-muted);
         }
-        .msg.me { color: var(--text-main); }
-        .msg.me .sender { color: var(--text-muted); }
-        .msg.peer { color: var(--accent-soft); }
+        .msg.me { 
+            color: var(--text-main); 
+            /* 我的訊息微光暈 */
+            text-shadow: var(--glow-main);
+        }
+        .msg.me .sender { color: var(--text-muted); text-shadow: none; }
+        
+        .msg.peer { 
+            color: var(--accent-soft); 
+            /* 陌生人訊息綠光暈 */
+            text-shadow: var(--glow-soft);
+        }
         .msg.peer .sender { color: var(--accent-soft); opacity: 0.8; }
         
         .msg.system { 
@@ -177,6 +197,7 @@
             padding: 10px 0;
             margin: 20px 0;
             font-weight: normal;
+            text-shadow: none;
         }
 
         /* 輸入區域 */
@@ -212,6 +233,7 @@
         button:hover { 
             border-color: var(--text-main);
             background: #252529;
+            box-shadow: var(--glow-main);
         }
         .btn-submit {
             margin-top: 35px;
@@ -233,6 +255,7 @@
         .btn-leave:hover { 
             background: #b33939; 
             color: #fff;
+            box-shadow: 0 0 8px #b33939;
         }
     </style>
 </head>
@@ -281,7 +304,7 @@
             </div>
             <div class="tag-item">
                 <input type="checkbox" id="tag-spanking" value="Spanking">
-                <label for="tag-cnc">Spaking</label>
+                <label for="tag-spanking">Spanking</label>
             </div>
             <div class="tag-item">
                 <input type="checkbox" id="tag-cnc" value="CNC">
@@ -340,6 +363,8 @@
     socket.on('match_success', (data) => {
         let matchInfo = `${data.target.nickname} (${data.target.pronoun})`;
         statusText.innerText = `已連接至系統 // 陌生人: ${matchInfo}`;
+        statusText.style.color = "var(--accent-soft)";
+        statusText.style.textShadow = "var(--glow-soft)";
         
         let sysMsg = `安全連線建立成功。`;
         if(data.common && data.common.length > 0) {
@@ -355,6 +380,8 @@
     socket.on('peer_left', (msg) => {
         appendMsg('SYSTEM', msg, 'system');
         statusText.innerText = '連線已中斷';
+        statusText.style.color = "var(--text-muted)";
+        statusText.style.textShadow = "none";
     });
 
     function sendMsg() {
