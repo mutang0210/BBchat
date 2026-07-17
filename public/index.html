@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>匿名聊天室</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { width: 90%; max-width: 400px; background: #1e1e1e; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .hidden { display: none; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border-radius: 4px; border: 1px solid #333; background: #2a2a2a; color: #fff; }
+        button { background: #007bff; cursor: pointer; border: none; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        #chatBox { height: 300px; border: 1px solid #333; overflow-y: auto; padding: 10px; margin-bottom: 10px; background: #151515; }
+        .msg { margin-bottom: 8px; }
+        .system { color: #aaa; font-style: italic; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="loginScreen">
+    <h2>匿名聊天</h2>
+    <input type="text" id="nickname" placeholder="輸入暱稱...">
+    <select id="gender">
+        <option value="男生">男生</option>
+        <option value="女生">女生</option>
+        <option value="不透露">不透露</option>
+    </select>
+    <button onclick="startMatch()">開始聊天</button>
+</div>
+
+<div class="container hidden" id="chatScreen">
+    <h3 id="statusText">正在連線...</h3>
+    <div id="chatBox"></div>
+    <div style="display: flex;">
+        <input type="text" id="msgInput" placeholder="輸入訊息..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <button onclick="sendMsg()" style="width: 80px; margin-left: 5px;">發送</button>
+    </div>
+    <button onclick="leaveChat()" style="background: #dc3545;">離開聊天</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io({ autoConnect: false });
+    const loginScreen = document.getElementById('loginScreen');
+    const chatScreen = document.getElementById('chatScreen');
+    const chatBox = document.getElementById('chatBox');
+    const statusText = document.getElementById('statusText');
+
+    function startMatch() {
+        const nickname = document.getElementById('nickname').value.trim();
+        const gender = document.getElementById('gender').value;
+
+        loginScreen.classList.add('hidden');
+        chatScreen.classList.remove('hidden');
+
+        socket.connect();
+        socket.emit('join_match', { nickname, gender });
+    }
+
+    socket.on('status', (msg) => {
+        statusText.innerText = msg;
+    });
+
+    socket.on('match_success', (data) => {
+        statusText.innerText = `與 [${data.target.nickname} (${data.target.gender})] 匿名連線中`;
+        appendMsg('系統', '配對成功！可以開始聊天了。', true);
+    });
+
+    socket.on('receive_msg', (data) => {
+        appendMsg(data.sender, data.text);
+    });
+
+    socket.on('peer_left', (msg) => {
+        appendMsg('系統', msg, true);
+        statusText.innerText = '對方已斷開連線';
+    });
+
+    function sendMsg() {
+        const input = document.getElementById('msgInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        socket.emit('send_msg', text);
+        appendMsg('我', text);
+        input.value = '';
+    }
+
+    function leaveChat() {
+        socket.emit('leave_room');
+        socket.disconnect();
+        chatBox.innerHTML = '';
+        chatScreen.classList.add('hidden');
+        loginScreen.classList.remove('hidden');
+    }
+
+    function appendMsg(sender, text, isSystem = false) {
+        const p = document.createElement('p');
+        p.className = isSystem ? 'msg system' : 'msg';
+        p.innerText = isSystem ? text : `${sender}: ${text}`;
+        chatBox.appendChild(p);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+</body>
+</html>
