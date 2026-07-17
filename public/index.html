@@ -247,7 +247,7 @@
         <input type="text" id="nickname" placeholder="留空則顯示為神秘人...">
         
         <label>Pronouns / 代名詞</label>
-        <input type="text" id="pronoun" placeholder="e.g. He/Him, She/Her, They/Them...">
+        <input type="text" id="pronoun" placeholder="e.g. 他/她, 大野狼, 小母狗, 小豬仔, 飛天鼠...">
         
         <label>Fetish Tags / 性癖標籤 (可複選，系統優先精準配對)</label>
         <div class="tag-container">
@@ -280,6 +280,10 @@
                 <label for="tag-leather">Leather</label>
             </div>
             <div class="tag-item">
+                <input type="checkbox" id="tag-spanking" value="Spanking">
+                <label for="tag-cnc">Spaking</label>
+            </div>
+            <div class="tag-item">
                 <input type="checkbox" id="tag-cnc" value="CNC">
                 <label for="tag-cnc">CNC</label>
             </div>
@@ -294,12 +298,12 @@
     <!-- 滿版聊天面板 -->
     <div id="chatScreen" class="hidden">
         <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <p id="statusText">正在同步解密信道...</p>
-            <button class="btn-leave" onclick="leaveChat()">離開聊天</button>
+            <p id="statusText">正在同步解密BB通道...</p>
+            <button class="btn-leave" onclick="leaveChat()">不想聊了</button>
         </div>
         <div id="chatBox"></div>
         <div class="input-area">
-            <input type="text" id="msgInput" placeholder="鍵入訊息，按下 Enter 發送..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <input type="text" id="msgInput" placeholder="輸入訊息，按下 Enter 發送..." onkeypress="if(event.key==='Enter') sendMsg()">
         </div>
     </div>
 </div>
