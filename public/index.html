@@ -6,17 +6,18 @@
     <title>BBChat 匿名聊天</title>
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --panel-bg: #111111;
-            --border-color: #ffb703; /* 經典復古琥珀橘 */
-            --text-main: #ffb703;
-            --text-muted: #b8860b;
-            --accent-green: #39ff14; /* 螢光復古綠 */
-            --input-bg: #161616;
+            --bg-color: #141416;       /* 溫和的極深灰黑，非純黑，減少眼睛壓力 */
+            --panel-bg: #1c1c1f;       /* 面板採用帶灰調的深色 */
+            --border-color: #3a3a3e;   /* 柔和的低對比灰線 */
+            --text-main: #e3e3e8;      /* 象牙白，最適合長時間閱讀 */
+            --text-muted: #8a8a93;     /* 溫和的低飽和中灰 */
+            --accent-soft: #81c784;    /* 溫和的護眼草綠色（取代刺眼的螢光綠） */
+            --input-bg: #222226;       /* 輸入框背景 */
+            --tag-checked-bg: #2d312e; /* 標籤選中時的低飽和綠灰底 */
         }
 
         body { 
-            font-family: 'Courier New', Courier, monospace, monospace; 
+            font-family: 'Courier New', Courier, monospace; 
             background-color: var(--bg-color); 
             color: var(--text-main); 
             margin: 0; 
@@ -30,14 +31,14 @@
             font-weight: bold;
         }
 
-        /* 滿版自適應容器 */
+        /* 自適應滿版大框架 */
         .wrapper {
             width: 100%;
             height: 100%;
-            max-width: 900px; /* 稍微拉寬，配合大字體 */
+            max-width: 850px; 
             background: var(--panel-bg);
-            border-left: 3px solid var(--border-color);
-            border-right: 3px solid var(--border-color);
+            border-left: 2px solid var(--border-color);
+            border-right: 2px solid var(--border-color);
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
@@ -45,7 +46,7 @@
 
         .hidden { display: none !important; }
 
-        /* 設定與登入畫面 */
+        /* 設定面板 */
         #loginScreen {
             padding: 40px;
             overflow-y: auto;
@@ -56,23 +57,23 @@
         }
 
         h1 {
-            font-size: 32px;
-            letter-spacing: 3px;
+            font-size: 28px;
+            letter-spacing: 2px;
             color: var(--text-main);
             margin: 0 0 30px 0;
             text-transform: uppercase;
-            border-bottom: 3px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 15px;
-            text-shadow: 0 0 8px var(--border-color);
         }
 
         label {
-            font-size: 16px;
-            color: var(--text-main);
+            font-size: 15px;
+            color: var(--text-muted);
             letter-spacing: 1px;
             display: block;
             margin-top: 25px;
             margin-bottom: 8px;
+            text-transform: uppercase;
         }
 
         input[type="text"] { 
@@ -83,24 +84,24 @@
             background: var(--input-bg); 
             color: var(--text-main);
             font-family: inherit;
-            font-size: 18px; /* 大字級 */
+            font-size: 18px; 
             font-weight: bold;
+            transition: border-color 0.2s ease;
         }
         input[type="text"]:focus {
             outline: none;
-            background: #1a1a1a;
-            box-shadow: 0 0 10px var(--border-color);
+            border-color: var(--text-main);
         }
 
-        /* 複選標籤大區塊樣式 */
+        /* 複選標籤排版 */
         .tag-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* 加大寬度 */
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
             gap: 12px;
             margin: 10px 0;
         }
 
-        .tag-item position: relative; }
+        .tag-item { position: relative; }
         .tag-item input[type="checkbox"] { display: none; }
         .tag-item label {
             display: block;
@@ -110,14 +111,14 @@
             text-align: center;
             cursor: pointer;
             margin: 0;
-            font-size: 16px; /* 加大字體 */
+            font-size: 16px; 
             color: var(--text-main);
-            transition: all 0.1s ease;
+            transition: all 0.15s ease;
         }
         .tag-item input[type="checkbox"]:checked + label {
-            background: var(--text-main);
-            color: #000; /* 反白效果 */
-            box-shadow: 0 0 12px var(--border-color);
+            background: var(--tag-checked-bg);
+            border-color: var(--accent-soft);
+            color: var(--accent-soft);
         }
 
         /* 聊天主畫面 */
@@ -130,57 +131,58 @@
 
         .chat-header {
             padding: 20px;
-            border-bottom: 3px solid var(--border-color);
-            background: #151515;
+            border-bottom: 2px solid var(--border-color);
+            background: #19191c;
         }
 
         #statusText {
             margin: 0;
-            font-size: 18px;
-            color: var(--accent-green);
-            text-shadow: 0 0 5px var(--accent-green);
+            font-size: 16px;
+            color: var(--text-muted);
         }
 
         #chatBox { 
             flex: 1;
             overflow-y: auto; 
             padding: 25px; 
-            background: #050505;
+            background: #141416; /* 深灰底，低反光 */
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
 
-        /* 訊息文本 */
+        /* 聊天訊息（寬敞、清晰大字體） */
         .msg { 
             margin: 0; 
             line-height: 1.6; 
-            font-size: 20px; /* 聊天大字體，利於清晰閱讀 */
+            font-size: 19px; 
             word-break: break-all;
         }
         .msg .sender { 
-            font-size: 16px; 
+            font-size: 15px; 
             margin-right: 12px; 
-            text-decoration: underline;
+            color: var(--text-muted);
         }
         .msg.me { color: var(--text-main); }
         .msg.me .sender { color: var(--text-muted); }
-        .msg.peer { color: var(--accent-green); }
-        .msg.peer .sender { color: var(--accent-green); }
+        .msg.peer { color: var(--accent-soft); }
+        .msg.peer .sender { color: var(--accent-soft); opacity: 0.8; }
+        
         .msg.system { 
-            color: #888; 
-            font-size: 15px; 
+            color: var(--text-muted); 
+            font-size: 14px; 
             text-align: center; 
-            border-top: 2px dashed #222;
-            border-bottom: 2px dashed #222;
+            border-top: 1px dashed var(--border-color);
+            border-bottom: 1px dashed var(--border-color);
             padding: 10px 0;
             margin: 20px 0;
+            font-weight: normal;
         }
 
         /* 輸入區域 */
         .input-area {
             display: flex;
-            border-top: 3px solid var(--border-color);
+            border-top: 2px solid var(--border-color);
             background: var(--input-bg);
         }
         .input-area input {
@@ -190,12 +192,12 @@
             padding: 24px;
             color: var(--text-main);
             font-family: inherit;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: bold;
         }
         .input-area input:focus { outline: none; }
 
-        /* 大按鈕設計 */
+        /* 按鈕設計 */
         button { 
             padding: 15px 30px; 
             background: transparent; 
@@ -205,29 +207,32 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer; 
-            letter-spacing: 1px;
+            transition: all 0.15s ease;
         }
         button:hover { 
-            background: var(--text-main);
-            color: #000;
-            box-shadow: 0 0 10px var(--border-color);
+            border-color: var(--text-main);
+            background: #252529;
         }
         .btn-submit {
             margin-top: 35px;
-            font-size: 20px;
-            padding: 20px;
+            font-size: 18px;
+            padding: 18px;
             width: 100%;
+            border-color: var(--text-muted);
+        }
+        .btn-submit:hover {
+            border-color: var(--text-main);
         }
         .btn-leave {
             background: transparent;
-            border: 2px solid #ef233c;
-            color: #ef233c;
-            padding: 10px 20px;
+            border: 2px solid #b33939;
+            color: #d1ccc0;
+            padding: 8px 16px;
+            font-size: 14px;
         }
         .btn-leave:hover { 
-            background: #ef233c; 
+            background: #b33939; 
             color: #fff;
-            box-shadow: 0 0 10px #ef233c;
         }
     </style>
 </head>
@@ -238,13 +243,13 @@
     <div id="loginScreen">
         <h1>BBChat 匿名聊天</h1>
         
-        <label>> NICKNAME / 暱稱</label>
+        <label>Nickname / 暱稱</label>
         <input type="text" id="nickname" placeholder="留空則顯示為神秘人...">
         
-        <label>> PRONOUNS / 代名詞</label>
+        <label>Pronouns / 代名詞</label>
         <input type="text" id="pronoun" placeholder="e.g. He/Him, She/Her, They/Them...">
         
-        <label>> FETISH TAGS / 性癖標籤 (可複選，系統優先精準配對)</label>
+        <label>Fetish Tags / 性癖標籤 (可複選，系統優先精準配對)</label>
         <div class="tag-container">
             <div class="tag-item">
                 <input type="checkbox" id="tag-dom" value="Dom/Master">
@@ -280,7 +285,7 @@
             </div>
         </div>
 
-        <label>> OTHER / 其他自填項目</label>
+        <label>Other / 其他自填項目</label>
         <input type="text" id="otherFetish" placeholder="輸入特定關鍵字...">
 
         <button class="btn-submit" onclick="startMatch()">[ 開始配對 ]</button>
@@ -289,8 +294,8 @@
     <!-- 滿版聊天面板 -->
     <div id="chatScreen" class="hidden">
         <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <p id="statusText">正在同步伺服器時脈...</p>
-            <button class="btn-leave" onclick="leaveChat()">[ 斷開連線 ]</button>
+            <p id="statusText">正在同步解密信道...</p>
+            <button class="btn-leave" onclick="leaveChat()">離開聊天</button>
         </div>
         <div id="chatBox"></div>
         <div class="input-area">
@@ -329,12 +334,12 @@
     });
 
     socket.on('match_success', (data) => {
-        let matchInfo = `[${data.target.nickname}] (${data.target.pronoun})`;
-        statusText.innerText = `CONNECTED // 與 ${matchInfo} 建立安全連線`;
+        let matchInfo = `${data.target.nickname} (${data.target.pronoun})`;
+        statusText.innerText = `已連接至系統 // 陌生人: ${matchInfo}`;
         
-        let sysMsg = `連線成功。`;
+        let sysMsg = `安全連線建立成功。`;
         if(data.common && data.common.length > 0) {
-            sysMsg += ` 偵測到共同興趣信號: ${data.common.join(', ')}`;
+            sysMsg += ` 共同標籤: ${data.common.join(', ')}`;
         }
         appendMsg('SYSTEM', sysMsg, 'system');
     });
@@ -345,7 +350,7 @@
 
     socket.on('peer_left', (msg) => {
         appendMsg('SYSTEM', msg, 'system');
-        statusText.innerText = 'DISCONNECTED // 對方已斷開信號';
+        statusText.innerText = '連線已中斷';
     });
 
     function sendMsg() {
@@ -371,11 +376,11 @@
         p.className = `msg ${type}`;
         
         if (type === 'system') {
-            p.innerText = `<< ${text} >>`;
+            p.innerText = `[ 系統通知: ${text} ]`;
         } else {
             const span = document.createElement('span');
             span.className = 'sender';
-            span.innerText = `${sender}`;
+            span.innerText = sender;
             p.appendChild(span);
             p.appendChild(document.createTextNode(`: ${text}`));
         }
